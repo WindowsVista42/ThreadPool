@@ -170,10 +170,10 @@ class ThreadPool {
       this->_threads[i].create(thread_main, this);
     }
 
-    dbg_thread.create(debug, this);
+    //dbg_thread.create(debug, this);
 
     // spin lock until all threads are created (required for synchronization)
-    //while(this->_waiting_count.load() != this->_thread_count) {
+    while(this->_waiting_count.load() != this->_thread_count) {}
     //  printf("here %lld!\n", this->_waiting_count.load());
     //}
   }

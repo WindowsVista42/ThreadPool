@@ -14,7 +14,8 @@ void some_work() {
 }
 
 int main() {
-  ThreadPool thread_pool = ThreadPool(); // by default uses the number of threads on your system
+  // create the thread pool with std::thread::hardware_concurrency() number of threads
+  ThreadPool thread_pool = ThreadPool();
 
   // add work to the threadpool
   thread_pool.push(some_work);

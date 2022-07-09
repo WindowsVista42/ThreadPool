@@ -2,6 +2,8 @@
 
 #include <atomic>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #if defined(_WIN32) || defined(_WIN64)
   #define __THREADPOOL_USE_WINDOWS__
@@ -149,8 +151,8 @@ class ThreadPool {
 
   // API
   public:
-  ThreadPool(int64_t thread_count = std::thread::hardware_concurrency()) :
-    _work_queue(1024)
+  ThreadPool(int64_t queue_size = 1024, int64_t thread_count = std::thread::hardware_concurrency()) :
+    _work_queue(queue_size)
   {
     this->_work_done_mutex = mutex();
     this->_work_start_cvar = cvar();
@@ -187,12 +189,12 @@ class ThreadPool {
   }
 
   using work_id = std::int64_t;
-  work_id add_work(work w) {
+  work_id push(work w) {
     this->_work_queue.push(w);
     return 0;
   }
 
-  bool work_is_done() {
+  bool finished() {
     return this->_work_queue.empty() && this->_working_count.load() == 0;
   }
 
@@ -226,7 +228,7 @@ class ThreadPool {
     this->_done_spin_lock.store(false, std::memory_order_relaxed);
   }
 
-  void begin() {
+  void start() {
     this->_should_notify.store(false);
 
     auto wq_size = this->_work_queue.size();

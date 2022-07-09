@@ -124,7 +124,7 @@ int main() {
   for(int i = 0; i < 10000000; i += 1) {
     auto t0 = std::chrono::high_resolution_clock::now();
     for(int i = 0; i < 4; i += 1) {
-      thread_pool.add_work(test_short_function);
+      thread_pool.push(test_short_function);
     }
 
     thread_pool.join();

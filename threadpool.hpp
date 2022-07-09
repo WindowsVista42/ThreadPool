@@ -8,7 +8,7 @@
   #include <Windows.h>
 #endif
 
-#include "work_stealing_queue.hpp"
+#include "wsq.hpp"
 
 class ThreadPool {
   struct mutex;

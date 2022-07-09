@@ -15,12 +15,14 @@ void some_work() {
 
 int main() {
   ThreadPool thread_pool = ThreadPool(); // by default uses the number of threads on your system
-  
+
+  // add work to the threadpool
   thread_pool.push(some_work);
   thread_pool.push(some_work);
   thread_pool.push(some_work);
   thread_pool.push(some_work);
 
+  // begin working and wait for all threads to finish
   thread_pool.join();
 }
 ```

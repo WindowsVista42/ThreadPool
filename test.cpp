@@ -1,46 +1,53 @@
 #include "threadpool.hpp"
 #include <algorithm>
 
-static void test_function() {
-  printf("doing work!\n");
-}
+// helper function to print a bunch of time statistics
+void print_time_info(std::vector<double>& times);
 
-static void test_function2() {
-  Sleep(1000);
-  printf("thing12\n");
-}
-
+// simple "work" function
+// atomically increments num
 static std::atomic_int64_t num(0);
 static void test_short_function() {
-  //num.fetch_add(1);
-  //for(int i = 0; i < 5; i ++) {
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //  num.fetch_add(rand() % 10);
-  //}
+  num.fetch_add(1);
   return;
 }
 
-static DWORD WINAPI print_num(PVOID) {
+static void print_num() {
   while(true) {
-    //printf("num: %llu\n", num);
-    //printf("num: %llu\n", num.load());
-    Sleep(1000);
+    printf("num: %llu\n", num.load());
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   }
+}
+
+// example usage (with timings taken)
+int main() {
+  // used to verify that we are not in a deadlock
+  std::thread pn = std::thread(print_num);
+  pn.detach();
+
+  // create the thread pool with a specified queue and thread count
+  auto QUEUE_SIZE = 1024; // must be power of 2
+  auto THREAD_COUNT = std::thread::hardware_concurrency() * 0.8;
+  ThreadPool thread_pool = ThreadPool(QUEUE_SIZE, THREAD_COUNT);
+
+  std::vector<double> times;
+
+  for(int i = 0; i < 1000000; i += 1) {
+    auto t0 = std::chrono::high_resolution_clock::now(); // begin timer
+    // push work to thread pool
+    for(int i = 0; i < 4; i += 1) {
+      thread_pool.push(test_short_function);
+    }
+
+    // begin work and wait until finished
+    thread_pool.join();
+    auto t1 = std::chrono::high_resolution_clock::now(); // end timer
+    times.push_back(std::chrono::duration<double>(t1 - t0).count());
+  }
+  printf("test loop finished!\n");
+
+  // print out timing specifics
+  print_time_info(times);
 }
 
 void print_time_info(std::vector<double>& times) {
@@ -108,30 +115,6 @@ void print_time_info(std::vector<double>& times) {
   printf("p1_high_avg_time: %.16lf\n", p1_high_avg_time);
   printf("p01_high_avg_time: %.16lf\n", p01_high_avg_time);
   printf("std_dev: %.16lf\n", std_dev);
-  printf("\n");
 
   valid.clear();
-}
-
-int main() {
-  auto THREAD_COUNT = std::thread::hardware_concurrency() * 0.8;
-  ThreadPool thread_pool = ThreadPool(THREAD_COUNT);
-
-  HANDLE thread_print_num = CreateThread(0, 0, print_num, 0, 0, 0);
-
-  std::vector<double> times;
-
-  for(int i = 0; i < 10000000; i += 1) {
-    auto t0 = std::chrono::high_resolution_clock::now();
-    for(int i = 0; i < 4; i += 1) {
-      thread_pool.push(test_short_function);
-    }
-
-    thread_pool.join();
-    auto t1 = std::chrono::high_resolution_clock::now();
-    times.push_back(std::chrono::duration<double>(t1 - t0).count());
-  }
-
-  printf("done\n");
-  print_time_info(times);
 }

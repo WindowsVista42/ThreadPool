@@ -1,5 +1,6 @@
 #include "threadpool.hpp"
 #include <algorithm>
+#include <cmath>
 
 // helper function to print a bunch of time statistics
 void print_time_info(std::vector<double>& times);

@@ -2,6 +2,9 @@
 
 A simple c++ threadpool implemented with a work stealing queue.
 
+## Requirements
+C++ 17 and a recent C++ compiler.
+
 ## Basic Usage
 Copy threadpool.hpp and wsq.hpp to your source folder.
 
@@ -14,7 +17,7 @@ void some_work() {
 }
 
 int main() {
-  // create the thread pool with a work queue size of 1024 entries and 
+  // create the thread pool with a work queue size of 1024 and 
   // std::thread::hardware_concurrency() number of threads
   ThreadPool thread_pool = ThreadPool();
 

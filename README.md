@@ -6,7 +6,7 @@ A simple c++ threadpool implemented with a work stealing queue.
 C++ 17 and a recent c++ compiler.
 
 ## Basic Usage
-Copy threadpool.hpp and wsq.hpp to your source folder.
+Copy or include threadpool.hpp and wsq.hpp into your working directory.
 
 ```
 #include <iostream>

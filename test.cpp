@@ -27,9 +27,9 @@ int main() {
   pn.detach();
 
   // create the thread pool with a specified queue and thread count
-  auto QUEUE_SIZE = 1024; // must be power of 2
   auto THREAD_COUNT = std::thread::hardware_concurrency() * 0.8;
-  ThreadPool thread_pool = ThreadPool(QUEUE_SIZE, THREAD_COUNT);
+  auto QUEUE_SIZE = 1024; // must be power of 2
+  ThreadPool thread_pool = ThreadPool(THREAD_COUNT, QUEUE_SIZE);
 
   std::vector<double> times;
 

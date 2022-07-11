@@ -87,7 +87,7 @@ class ThreadPool {
   // API
   public:
   // Create a thread pool with the specified (power of two) queue_size and thread_count
-  ThreadPool(int64_t queue_size = 1024, int64_t thread_count = std::thread::hardware_concurrency()) :
+  ThreadPool(int64_t thread_count = std::thread::hardware_concurrency(), int64_t queue_size = 1024) :
     // init internals
     _work_queue(queue_size),
     _work_start_mutex(),

@@ -132,11 +132,9 @@ class ThreadPool {
     delete[] this->_threads;
   }
 
-  using work_id = std::int64_t;
   // Push work onto the threadpools queue
-  work_id push(work w) {
+  void push(work w) {
     this->_work_queue.push(w);
-    return 0;
   }
 
   // Query if the threadpool has finished the current batch of work

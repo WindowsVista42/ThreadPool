@@ -20,6 +20,8 @@ static void print_num() {
   }
 }
 
+ThreadPool thread_pool;
+
 // example usage (with timings taken)
 int main() {
   // used to verify that we are not in a deadlock
@@ -29,7 +31,7 @@ int main() {
   // create the thread pool with a specified queue and thread count
   auto THREAD_COUNT = std::thread::hardware_concurrency() * 0.8;
   auto QUEUE_SIZE = 1024; // must be power of 2
-  ThreadPool thread_pool = ThreadPool(THREAD_COUNT, QUEUE_SIZE);
+  thread_pool.init(THREAD_COUNT, QUEUE_SIZE);
 
   std::vector<double> times;
 
@@ -49,6 +51,8 @@ int main() {
 
   // print out timing specifics
   print_time_info(times);
+
+  thread_pool.deinit();
 }
 
 void print_time_info(std::vector<double>& times) {

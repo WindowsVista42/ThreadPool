@@ -33,24 +33,24 @@ class ThreadPool {
 
   static void thread_main(void* data) {
     ThreadPool* pool = (ThreadPool*)data;
-    pool->_initialized_count.fetch_add(1, std::memory_order_relaxed);
+    pool->_initialized_count.fetch_add(1);
 
     auto start_lock = std::unique_lock<std::mutex>(pool->_work_start_mutex, std::defer_lock);
 
     while(true) {
       start_lock.lock();
-      pool->_waiting_count.fetch_add(1, std::memory_order_relaxed); // tell main thread we are waiting
+      pool->_waiting_count.fetch_add(1); // tell main thread we are waiting
 
       // sleep until we have work to do or we need to exit
-      while(pool->_work_queue.empty() && !pool->_stop_working.load(std::memory_order_relaxed)) {
+      while(pool->_work_queue.empty() && !pool->_stop_working.load()) {
         pool->_work_start_cvar.wait(start_lock);
       }
 
       start_lock.unlock();
-      pool->_waiting_count.fetch_sub(1, std::memory_order_relaxed); // tell main thread we are no longer waiting
+      pool->_waiting_count.fetch_sub(1); // tell main thread we are no longer waiting
                                                                     //
       // exit the thread
-      if(pool->_stop_working.load(std::memory_order_relaxed)) {
+      if(pool->_stop_working.load()) {
         break;
       }
 
@@ -72,16 +72,16 @@ class ThreadPool {
 
       // if we are the last thread to finish, tell the main thread that
       // all threads have finished
-      if(pool->_work_queue.empty() && pool->_working_count.load(std::memory_order_relaxed) == 0) {
+      if(pool->_work_queue.empty() && pool->_working_count.load() == 0) {
         // spin lock until we have confirmation from the main thread that
         // it knows we are done working
-        while(pool->_should_notify.load(std::memory_order_relaxed) && !pool->_done_spin_lock.load(std::memory_order_relaxed)) {
+        while(pool->_should_notify.load() && !pool->_done_spin_lock.load() && pool->_working_count.load() == 0 && pool->_work_queue.empty()) {
           pool->_work_done_cvar.notify_all();
         }
       }
     }
 
-    pool->_initialized_count.fetch_sub(1, std::memory_order_relaxed);
+    pool->_initialized_count.fetch_sub(1);
   }
 
   // API
@@ -153,7 +153,10 @@ class ThreadPool {
 
   // Begin working and wait until all threads have finished their work
   void join() {
-    this->_should_notify.store(true, std::memory_order_relaxed);
+    // wait until all threads have gone back to the waiting state
+    //while(this->_waiting_count.load() != this->_thread_count) {}
+
+    this->_should_notify.store(true);
 
     // tell threads to begin working
     auto wq_size = this->_work_queue.size();
@@ -169,18 +172,18 @@ class ThreadPool {
     auto done_lock = std::unique_lock<std::mutex>(this->_work_done_mutex, std::defer_lock);
     done_lock.lock();
 
-    while(!this->_work_queue.empty() && this->_working_count.load(std::memory_order_relaxed) != 0) {
+    while(!this->_work_queue.empty() || this->_working_count.load() != 0) {
       this->_work_done_cvar.wait(done_lock);
     }
     done_lock.unlock();
 
     // notify the notifying thread that we are awakened
-    this->_done_spin_lock.store(true, std::memory_order_relaxed);
+    this->_done_spin_lock.store(true);
 
     // wait until all threads have gone back to the waiting state
-    while(this->_waiting_count.load(std::memory_order_relaxed) != this->_thread_count) {}
+    while(this->_waiting_count.load() != this->_thread_count) {}
 
     // reset previous spin lock state
-    this->_done_spin_lock.store(false, std::memory_order_relaxed);
+    this->_done_spin_lock.store(false);
   }
 };

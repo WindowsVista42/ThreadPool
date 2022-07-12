@@ -86,16 +86,11 @@ class ThreadPool {
 
   // API
   public:
-  // Create a thread pool with the specified (power of two) queue_size and thread_count
-  ThreadPool(int64_t thread_count = std::thread::hardware_concurrency(), int64_t queue_size = 1024) :
-    // init internals
-    _work_queue(queue_size),
-    _work_start_mutex(),
-    _work_start_cvar(),
+  ThreadPool() {}
+  ~ThreadPool() {}
 
-    _work_done_mutex(),
-    _work_done_cvar()
-  {
+  // Init a thread pool with the specified (power of two) queue_size and thread_count
+  void init(int64_t thread_count = std::thread::hardware_concurrency(), int64_t queue_size = 1024) {
     // init internals
     this->_initialized_count.store(0);
     this->_working_count.store(0);
@@ -116,8 +111,8 @@ class ThreadPool {
     while(this->_waiting_count.load() != this->_thread_count) {}
   }
 
-  // Destroy a thread pool, waiting for all threads to complete work
-  ~ThreadPool() {
+  // Deinit a thread pool, waiting for all threads to complete work
+  void deinit() {
     this->join();
     // wait until all threads are waiting
     while(this->_waiting_count.load() != this->_thread_count) {}

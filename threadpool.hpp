@@ -89,7 +89,7 @@ class ThreadPool {
   ThreadPool() {}
   ~ThreadPool() {}
 
-  // Init a thread pool with the specified (power of two) queue_size and thread_count
+  // Init a thread pool with the specified thread_count and (power of two) queue_size
   void init(int64_t thread_count = std::thread::hardware_concurrency(), int64_t queue_size = 1024) {
     // init internals
     this->_initialized_count.store(0);

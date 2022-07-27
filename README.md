@@ -19,7 +19,8 @@ void some_work() {
 int main() {
   // create the thread pool with a work queue size of 1024 and 
   // std::thread::hardware_concurrency() number of threads
-  ThreadPool thread_pool = ThreadPool();
+  ThreadPool thread_pool;
+  thread_pool.init();
 
   // add work to the threadpool
   thread_pool.push(some_work);
@@ -29,6 +30,8 @@ int main() {
 
   // begin working and wait for all threads to finish
   thread_pool.join();
+  
+  thread_pool.deinit();
 }
 ```
 

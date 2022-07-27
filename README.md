@@ -29,8 +29,10 @@ int main() {
   thread_pool.push(some_work);
 
   // begin working and wait for all threads to finish
+  // runs some_work() printing "Hello there from another thread!" four times
   thread_pool.join();
   
+  // deinit and clean up, not really necessary but it's more 'proper'
   thread_pool.deinit();
 }
 ```

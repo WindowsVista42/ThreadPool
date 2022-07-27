@@ -133,7 +133,7 @@ class ThreadPool {
   }
 
   // Query if the threadpool has finished the current batch of work
-  bool finished() {
+  bool finished() const {
     return this->_work_queue.empty() && this->_working_count.load() == 0;
   }
 
@@ -185,5 +185,9 @@ class ThreadPool {
 
     // reset previous spin lock state
     this->_done_spin_lock.store(false);
+  }
+
+  int64_t thread_count() const {
+    return _thread_count;
   }
 };

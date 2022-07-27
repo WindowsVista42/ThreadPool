@@ -153,9 +153,6 @@ class ThreadPool {
 
   // Begin working and wait until all threads have finished their work
   void join() {
-    // wait until all threads have gone back to the waiting state
-    //while(this->_waiting_count.load() != this->_thread_count) {}
-
     this->_should_notify.store(true);
 
     // tell threads to begin working

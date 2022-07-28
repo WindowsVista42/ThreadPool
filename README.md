@@ -1,7 +1,8 @@
 # ThreadPool
 
 A simple c++ threadpool implemented with a work stealing queue.  
-This implementation is used for a person game engine project so it makes certain concessions, primarily using `.init()` and `.deinit()` over constructors and destructors, and using only `void(*)()` type functions.
+This implementation is used for a person game engine project so it makes certain concessions, primarily using `.init()` and `.deinit()` over constructors and destructors, and using only `void(*)()` type functions.  
+This implementation also aims to keep latencies low and may not be the most energy efficient due to using a few strategic busy waits.
 
 ## Requirements
 C++ 17 and a recent c++ compiler.

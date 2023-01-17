@@ -1,6 +1,10 @@
 #include "threadpool.hpp"
+
+#include <vector>
 #include <algorithm>
 #include <cmath>
+#include <atomic>
+#include <thread>
 
 // helper function to print a bunch of time statistics
 void print_time_info(std::vector<double>& times);
@@ -20,7 +24,7 @@ static void print_num() {
   }
 }
 
-ThreadPool thread_pool;
+ThreadPool* thread_pool;
 
 // example usage (with timings taken)
 int main() {
@@ -31,19 +35,19 @@ int main() {
   // create the thread pool with a specified queue and thread count
   auto THREAD_COUNT = std::thread::hardware_concurrency() * 0.8;
   auto QUEUE_SIZE = 1024; // must be power of 2
-  thread_pool.init(THREAD_COUNT, QUEUE_SIZE);
+  thread_pool = create_thread_pool(THREAD_COUNT, QUEUE_SIZE);
 
   std::vector<double> times;
 
   for(int i = 0; i < 1000000; i += 1) {
     auto t0 = std::chrono::high_resolution_clock::now(); // begin timer
     // push work to thread pool
-    for(int i = 0; i < 4; i += 1) {
-      thread_pool.push(test_short_function);
+    for(int x = 0; x < 4; x += 1) {
+      thread_pool_push(thread_pool, test_short_function);
     }
 
     // begin work and wait until finished
-    thread_pool.join();
+    thread_pool_join(thread_pool);
     auto t1 = std::chrono::high_resolution_clock::now(); // end timer
     times.push_back(std::chrono::duration<double>(t1 - t0).count());
   }
@@ -52,7 +56,7 @@ int main() {
   // print out timing specifics
   print_time_info(times);
 
-  thread_pool.deinit();
+  destroy_thread_pool(thread_pool);
 }
 
 void print_time_info(std::vector<double>& times) {
@@ -103,7 +107,7 @@ void print_time_info(std::vector<double>& times) {
   double std_dev = 0.0;
   int subc = 0;
 
-  for(int i = 0; i < valid.size(); i += 1) {
+  for(int i = 0; i < (int)valid.size(); i += 1) {
     if(valid[i] > 0.0005) {
       subc += 1;
     } else {

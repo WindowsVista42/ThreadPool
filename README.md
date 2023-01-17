@@ -37,4 +37,4 @@ int main() {
 ```
 
 ## Third Party
-Uses taskflow work stealing queue: https://github.com/taskflow/work-stealing-queue
+Taskflow work stealing queue (copied into this repo for convenience): https://github.com/taskflow/work-stealing-queue

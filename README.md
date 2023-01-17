@@ -1,14 +1,12 @@
 # ThreadPool
 
-A simple c++ threadpool implemented with a work stealing queue.  
-This implementation is used for a person game engine project so it makes certain concessions, primarily using `.init()` and `.deinit()` over constructors and destructors, and using only `void(*)()` type functions.  
-This implementation also aims to keep latencies low and may not be the most energy efficient due to using a few strategic busy waits.
+A simple threadpool implemented in C-style C++ with a work stealing queue.  
 
 ## Requirements
 C++ 17 and a recent c++ compiler.
 
 ## Basic Usage
-Copy or include threadpool.hpp and wsq.hpp into your working directory.
+Include threadpool.hpp, threadpool.cpp and wsq.hpp into your build system.
 
 ```
 #include <iostream>
@@ -19,23 +17,22 @@ void some_work() {
 }
 
 int main() {
-  // create the thread pool with a work queue size of 1024 and 
-  // std::thread::hardware_concurrency() number of threads
-  ThreadPool thread_pool;
-  thread_pool.init();
+  // create the thread pool with 4 threads and a work queue that can hold 1024 items
+  ThreadPool* thread_pool = create_thread_pool(4, 1024);
 
-  // add work to the threadpool
-  thread_pool.push(some_work);
-  thread_pool.push(some_work);
-  thread_pool.push(some_work);
-  thread_pool.push(some_work);
+  // push work onto the threadpool
+  thread_pool_push(thread_pool, some_work);
+  thread_pool_push(thread_pool, some_work);
+  thread_pool_push(thread_pool, some_work);
+  thread_pool_push(thread_pool, some_work);
 
   // begin working and wait for all threads to finish
   // runs some_work() printing "Hello there from another thread!" four times
-  thread_pool.join();
+  thread_pool_join(thread_pool);
   
-  // deinit and clean up, not really necessary but it's more 'proper'
-  thread_pool.deinit();
+  // deinit and clean up
+  // not strictly necessary since a threadpool is likely going to live for the entire lifetime of the program
+  destroy_thread_pool(thread_pool);
 }
 ```
 

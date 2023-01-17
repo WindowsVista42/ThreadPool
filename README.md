@@ -1,6 +1,6 @@
 # ThreadPool
 
-A simple threadpool implemented in C-style C++ with a work stealing queue.  
+A simple thread pool implemented in C-style C++ with a work stealing queue.  
 
 ## Requirements
 C++ 17 and a recent c++ compiler.

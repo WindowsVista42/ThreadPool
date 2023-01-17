@@ -35,6 +35,7 @@ int main() {
   destroy_thread_pool(thread_pool);
 }
 ```
+A more detailed usage can be found in [examples/text.cpp](examples/text.cpp)
 
 ## Third Party
 Taskflow work stealing queue (copied into this repo for convenience): https://github.com/taskflow/work-stealing-queue

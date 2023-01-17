@@ -8,7 +8,7 @@ C++ 17 and a recent C++ compiler.
 ## Basic Usage
 Include threadpool.hpp, threadpool.cpp and wsq.hpp into your build system.
 
-```
+```c++
 #include <iostream>
 #include "threadpool.hpp"
 

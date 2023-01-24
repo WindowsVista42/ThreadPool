@@ -111,9 +111,7 @@ ThreadPool* create_thread_pool(int thread_count, int queue_size) {
   return thread_pool;
 }
 
-void destroy_thread_pool(ThreadPool* thread_pool_ptr) {
-  ThreadPool* thread_pool = (ThreadPool*)thread_pool_ptr;
-
+void destroy_thread_pool(ThreadPool* thread_pool) {
   thread_pool_join(thread_pool);
 
   // wait until all threads are waiting
@@ -130,21 +128,15 @@ void destroy_thread_pool(ThreadPool* thread_pool_ptr) {
   delete thread_pool;
 }
 
-void thread_pool_push(ThreadPool* thread_pool_ptr, VoidFunctionPtr work_function) {
-  ThreadPool* thread_pool = (ThreadPool*)thread_pool_ptr;
-
+void thread_pool_push(ThreadPool* thread_pool, VoidFunctionPtr work_function) {
   thread_pool->work_queue.push(work_function);
 }
 
-bool thread_pool_is_finished(ThreadPool* thread_pool_ptr) {
-  ThreadPool* thread_pool = (ThreadPool*)thread_pool_ptr;
-
+bool thread_pool_is_finished(ThreadPool* thread_pool) {
   return thread_pool->work_queue.empty() && thread_pool->working_count.load() == 0;
 }
 
-void thread_pool_start(ThreadPool* thread_pool_ptr) {
-  ThreadPool* thread_pool = (ThreadPool*)thread_pool_ptr;
-
+void thread_pool_start(ThreadPool* thread_pool) {
   thread_pool->should_notify.store(false);
 
   std::int64_t wq_size = thread_pool->work_queue.size();
@@ -157,9 +149,7 @@ void thread_pool_start(ThreadPool* thread_pool_ptr) {
   }
 }
 
-void thread_pool_join(ThreadPool* thread_pool_ptr) {
-  ThreadPool* thread_pool = (ThreadPool*)thread_pool_ptr;
-
+void thread_pool_join(ThreadPool* thread_pool) {
   // wait until all threads have gone back to the waiting state
   //while(thread_pool->_waiting_count.load() != thread_pool->_thread_count) {}
 
@@ -194,6 +184,6 @@ void thread_pool_join(ThreadPool* thread_pool_ptr) {
   thread_pool->done_spin_lock.store(false);
 }
 
-int thread_pool_thread_count(ThreadPool* thread_pool_ptr) {
-  return ((ThreadPool*)thread_pool_ptr)->thread_count;
+int thread_pool_thread_count(ThreadPool* thread_pool) {
+  return (thread_pool)->thread_count;
 }

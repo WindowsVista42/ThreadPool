@@ -1,14 +1,15 @@
 # ThreadPool
 
 A simple thread pool implemented in C-style C++ with a work stealing queue.  
+This thread pool uses os-threads and is intended to be created at startup and live for the lifetime of your program.  
 
 ## Requirements
-C++ 17 and a recent c++ compiler.
+C++ 17 and a recent C++ compiler.
 
 ## Basic Usage
 Include threadpool.hpp, threadpool.cpp and wsq.hpp into your build system.
 
-```
+```c++
 #include <iostream>
 #include "threadpool.hpp"
 
@@ -35,6 +36,7 @@ int main() {
   destroy_thread_pool(thread_pool);
 }
 ```
+A more detailed usage can be found in [examples/test.cpp](examples/test.cpp).
 
 ## Third Party
 Taskflow work stealing queue (copied into this repo for convenience): https://github.com/taskflow/work-stealing-queue

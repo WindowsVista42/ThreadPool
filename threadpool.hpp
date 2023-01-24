@@ -1,8 +1,7 @@
 #pragma once
 
 using VoidFunctionPtr = void (*)();
-
-using ThreadPool = void;
+struct ThreadPool;
 
 // Create a thread pool with the specified thread_count and specified (power of two) queue_size
 ThreadPool* create_thread_pool(int thread_count, int queue_size = 1024);

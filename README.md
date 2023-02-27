@@ -39,4 +39,4 @@ int main() {
 A more detailed usage can be found in [examples/test.cpp](examples/test.cpp).
 
 ## Third Party
-Taskflow work stealing queue (copied into this repo for convenience): https://github.com/taskflow/work-stealing-queue
+Taskflow work stealing queue: https://github.com/taskflow/work-stealing-queue

@@ -1,7 +1,7 @@
 # ThreadPool
 
-A simple thread pool implemented in C-style C++ with a work stealing queue.  
-This thread pool uses os-threads and is intended to be created at startup and live for the lifetime of your program.  
+A simple thread pool implemented with a work stealing queue.  
+This thread pool is intended to be the backbone any higher-order concurrency an application might need.
 
 ## Requirements
 C++ 17 and a recent C++ compiler.

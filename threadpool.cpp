@@ -150,9 +150,6 @@ void thread_pool_start(ThreadPool* thread_pool) {
 }
 
 void thread_pool_join(ThreadPool* thread_pool) {
-  // wait until all threads have gone back to the waiting state
-  //while(thread_pool->_waiting_count.load() != thread_pool->_thread_count) {}
-
   thread_pool->should_notify.store(true);
 
   // tell threads to begin working

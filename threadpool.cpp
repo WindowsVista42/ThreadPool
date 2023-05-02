@@ -7,6 +7,11 @@
 
 #include "threadpool.hpp"
 
+struct FuncData {
+  VoidFunctionPtr func;
+  void* data;
+};
+
 struct ThreadPool {
   std::int64_t thread_count;
   std::thread* threads;
@@ -24,7 +29,7 @@ struct ThreadPool {
   std::atomic_bool should_notify;
   std::atomic_bool stop_working;
 
-  WorkStealingQueue<VoidFunctionPtr> work_queue;
+  WorkStealingQueue<FuncData> work_queue;
 
   ThreadPool(int64_t queue_size) :
     work_queue(queue_size)
@@ -61,11 +66,11 @@ static void thread_main(void* data) {
     if(work.has_value()) {
       pool->working_count.fetch_add(1);
 
-      work.value()();
+      work.value().func();
 
       work = pool->work_queue.steal();
       while(work.has_value()) {
-        work.value()();
+        work.value().func();
         work = pool->work_queue.steal();
       }
 
@@ -129,7 +134,7 @@ void destroy_thread_pool(ThreadPool* thread_pool) {
 }
 
 void thread_pool_push(ThreadPool* thread_pool, VoidFunctionPtr work_function) {
-  thread_pool->work_queue.push(work_function);
+  thread_pool->work_queue.push(FuncData {work_function, 0});
 }
 
 bool thread_pool_is_finished(ThreadPool* thread_pool) {
